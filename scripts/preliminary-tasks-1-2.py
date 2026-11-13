@@ -413,4 +413,4 @@ print("Accuracy:", round(accuracy_score(y_test, word_only_preds), 3))
 print("ROC AUC:", round(roc_auc_score(y_test, word_only_probs), 3))
 
 # AI Use:
-# AI was used to translate and adapt R code preprocessing.R into Python.
+# AI was used to translate and adapt course R code into Python assisting with logistic PCR/ bigram modeling + troubleshooting errors
