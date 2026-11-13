@@ -8,9 +8,13 @@ date: today
 
 Does including header content improve predictions? Answer the question and provide quantitative evidence supporting your answer.
 
+For the Preliminary Task #1 we modified the HTML scraping to include the header tags (h1-h6) in addition to the paragraph ones. of 2,140 HTML webpages, 2,068 had additional header words. Post filtering, we find that we used 1,576 observations for training with 395 testing. We compared logistic principal component regression models using the 120 components selected through validation. The paragraph only model achieved a 79.5% accuracy and 0.863 ROC AUC and the paragraph + header model achieved 78.7% accuracy with 0.847 ROC AUC. This is telling that including headers did not improve binary classification performance.
+
 ### Bigrams
 
 Do bigrams capture additional information relevant to the classification of interest? Answer the question, **briefly** describe what analysis you conducted to arrive at your answer, and provide quantitative evidence supporting your answer.
+
+For Preliminary Task #2, we were looking at whether bigrams provided additional predictive information beyond individual words. When generating an out of fold predicted log odds on the bass of word logistic principal component regression model, combining them with bigram principal components in a second logistic regression. We compared 0, 10, 20, 40, and 80 bigram components using the validation data. The 40 component model achieved the highest validation ROC AUC 0.880, slightly above the word only baseline of 0.877. However, on the test set adding bigrams decreased accuracy from 79.2% to 78.7% and ROC AUC from 0.863 to 0.858. In essence, we found no clear evidence bigrams improved classification performance.
 
 ### Neural net
 
