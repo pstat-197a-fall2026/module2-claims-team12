@@ -1,37 +1,61 @@
 ---
 title: "Predictive modeling of claims status"
-author: 'YOUR NAMES HERE'
+author: "Team 12"
 date: today
+format:
+  html:
+    embed-resources: true
+execute:
+  echo: false
+  message: false
 ---
+
+```{r}
+model <- readRDS("../results/multiclass-model.rds")
+percent <- function(x) sprintf("%.1f%%", 100 * x)
+```
 
 ### Abstract
 
-Provide a 3-5 sentence summary of your work on the primary task. Indicate what input data was used, what method was used for binary class predictions, what method was used for multiclass predictions, and what estimated accuracies were achieved.
+**Part (a):** *[Add the binary model and its validation accuracy.]*
 
-> *Header and paragraph content was scraped from the raw webpages and processed into term frequencies of word tokens. For binary classification, a two-layer neural network yielded an estimated 81.4% accuracy; for multiclass classification, a support vector machine gave 78% accuracy.*
+**Part (b):** We used webpage text to predict five claim categories with ridge multinomial regression. Validation accuracy was `r percent(model$metrics$Accuracy)`. The final model was trained on all 2,165 labeled pages and used to classify 929 test pages.
 
 ### Preprocessing
 
-In one paragraph lay out your preprocessing pipeline. No need to provide exact step-by-step detail; just give an overview of the main components:
+**Part (a):** *[Add a brief description of the text used and how it was prepared.]*
 
--   what text content was extracted from HTML
-
--   how text was cleaned
-
--   how cleaned text was represented quantitatively
+**Part (b):** We extracted titles, headings, and paragraphs, cleaned the text, and converted words and word pairs into TF-IDF scores that reflect their importance in each page.
 
 ### Methods
 
-Describe your final predictive models. Include one paragraph with details on the binary classification approach, and one on the multiclass approach. Include for each:
+**Part (a):** *[Add the binary method, how it was chosen, and how it was evaluated.]*
 
--   what ML/statistical method was used
-
--   model specification and hyperparameter selection
-
--   training method
+**Part (b):** We fitted ridge multinomial regression, selected its penalty using tuning data, and measured performance on a separate validation set. Pages from the same subject stayed together when splitting the data.
 
 ### Results
 
-Indicate the predictive accuracy of the binary classifications and the multiclass classifications. Provide a table for each, and report sensitivity, specificity, and accuracy.[^1]
+**Part (a): Binary classification**
 
-[^1]: Read [this article](https://yardstick.tidymodels.org/articles/multiclass.html) on multiclass averaging.
+| Model | Accuracy | Sensitivity | Specificity |
+|:------|---------:|------------:|------------:|
+| *[Add model]* | *[Add]* | *[Add]* | *[Add]* |
+
+**Part (b): Multiclass classification**
+
+```{r}
+knitr::kable(data.frame(Model = "Ridge multinomial regression",
+                        Accuracy = percent(model$metrics$Accuracy),
+                        Sensitivity = percent(model$metrics$Sensitivity),
+                        Specificity = percent(model$metrics$Specificity)))
+```
+
+For Part (b), sensitivity and specificity give equal weight to each of the five classes.
+
+### Comparison of models and results
+
+**Part (a):** *[Compare the binary model with its baseline or other models tested.]*
+
+**Part (b):** Accuracy was `r percent(model$metrics$Accuracy)`, compared with `r percent(model$baseline_accuracy)` for always choosing the most common class. The model identified `r percent(model$per_class$Sensitivity[5])` of “Other claim content” pages, showing room for improvement in this smaller class.
+
+**Overall:** *[Summarize the main findings from both parts. Compare each model with its own baseline, since the two tasks differ.]*
