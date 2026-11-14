@@ -65,3 +65,31 @@ If this were a technical project, you might be expected to provide a *brief* exe
 -   ***Deliverable 4:*** deployable copies of your fitted predictive models, stored in the `results` directory, with a short script illustrating their use to generate predictions on the test data, stored in the `scripts` directory.
 
 *Your written summaries should be **very** high-level with a minimum of technical detail. The audience for your writeups is a project mentor or supervisor: assume the reader is familiar with the project and has a working knowledge of the methods you've used. The aim of each summary is to convey the task(s) and result(s) as simply as possible in a linear fashion: task 1, result 1; task 2, result 2; and so on. Note that your results for each task are simply a predictive accuracy (one or a few numbers) and a comment on the accuracy (generally, comparison with another result).*
+
+
+## Team 12 submission files
+
+| Deliverable | Files |
+| --- | --- |
+| 1: Preliminary tasks 1-3 | `writeups/tasks-summary.html` (editable source: `.qmd`) |
+| 2: Primary tasks (a) and (b) | `writeups/prediction-summary.html` (editable source: `.qmd`) |
+| 3: All 929 test predictions | `results/preds-group12.RData`, containing `pred_df` with `.id`, `bclass.pred`, and `mclass.pred` |
+| 4: Binary model and example | `results/binary-final-model.keras` and `scripts/varun/binary-predict.R` |
+| 4: Multiclass model and example | `results/multiclass-model.rds` and `scripts/multiclass-predict.R` |
+
+Run the prediction scripts from the project root; neither retrains a model:
+
+```bash
+Rscript scripts/varun/binary-predict.R
+Rscript scripts/multiclass-predict.R
+```
+
+They write the binary and multiclass component predictions to
+`results/preds-binary-group12.RData` and `results/preds-multiclass-group12.RData`.
+The submitted combined predictions are already saved in `results/preds-group12.RData`.
+
+The binary script requires `keras3`, `tensorflow`, `tidyverse`, the packages listed in
+`scripts/preprocessing.R`, and a configured TensorFlow Python backend. It rebuilds
+text vectorization from `data/claims-raw.RData` before loading the saved network.
+The multiclass script requires `rvest`, `quanteda`, `Matrix`, and `glmnet`; its
+vocabulary and IDF weights are included in the saved model.

@@ -5,6 +5,12 @@ date: today
 format:
   html:
     embed-resources: true
+    fontsize: 10pt
+    include-in-header:
+      text: |
+        <style>
+        @media print { body { font-size: 10pt; line-height: 1.3; } h3 { font-size: 12pt; margin-top: 0.75em; } #title-block-header { margin-bottom: 1em; } }
+        </style>
 execute:
   echo: false
   message: false
@@ -13,56 +19,43 @@ execute:
 ```{r}
 model <- readRDS("../results/multiclass-model.rds")
 percent <- function(x) sprintf("%.1f%%", 100 * x)
-
 binary_all <- readRDS("../results/binary_final_comparison.rds")
-binary_results <- binary_all |> dplyr::filter(variant == "2. more epochs + early stopping")
-binary_baseline <- binary_all |> dplyr::filter(variant == "1. baseline (25 units, dropout 0.2, 5 epochs)")
+binary_results <- binary_all[binary_all$variant == "2. more epochs + early stopping", ]
+binary_baseline <- binary_all[binary_all$variant == "1. baseline (25 units, dropout 0.2, 5 epochs)", ]
 ```
 
 ### Abstract
 
-**Part (a):** We used paragraph text from each page, represented as TF-IDF word-importance scores, to train a small neural network for binary classification. Training with early stopping to avoid overfitting, the model achieved `r percent(binary_results$accuracy)` validation accuracy. The final model was trained on all 2,165 labeled pages and used to classify 929 test pages.
-
-**Part (b):** We used webpage text to predict five claim categories with ridge multinomial regression. Validation accuracy was `r percent(model$metrics$Accuracy)`. The final model was trained on all 2,165 labeled pages and used to classify 929 test pages.
+We developed binary and five-category models from webpage text. Both models improved on their baselines and generated predictions for all 929 test pages.
 
 ### Preprocessing
 
-**Part (a):** Paragraph text was extracted from each page's HTML, cleaned (URLs, emails, punctuation, and numbers removed), and converted into TF-IDF scores reflecting how distinctive each word was on that page.
+**Part (a):** Paragraph text was cleaned and converted into TF-IDF word-importance scores.
 
-**Part (b):** We extracted titles, headings, and paragraphs, cleaned the text, and converted words and word pairs into TF-IDF scores that reflect their importance in each page.
+**Part (b):** Titles, headings, and paragraphs were cleaned and converted into TF-IDF scores for words and word pairs.
 
 ### Methods
 
-**Part (a):** We trained a small neural network (two dense layers with dropout) on the TF-IDF features. Several alternatives were tested and ruled out: adjusting network size and dropout, a support vector machine, a regularized logistic regression on the full vocabulary, adding page headers/titles to the input text, and tuning the classification threshold. The best and most consistent approach was training with early stopping, which halts training once a held-out validation score stops improving, correcting for overfitting seen with a fixed number of training epochs. The chosen model was evaluated on a held-out 20% test split before being retrained on all labeled data for deployment.
+**Part (a):** We compared neural networks, SVM, and regularized logistic regression. The selected network used early stopping. The final network used 90% of cleaned labeled pages for fitting and 10% for early stopping.
 
-**Part (b):** We fitted ridge multinomial regression, selected its penalty using tuning data, and measured performance on a separate validation set. Pages from the same subject stayed together when splitting the data.
+**Part (b):** We tuned ridge multinomial regression and evaluated it on a separate validation set, keeping pages from the same subject together. The final model used all 2,165 labeled pages.
 
 ### Results
 
-**Part (a): Binary classification**
-
 ```{r}
-knitr::kable(data.frame(Model = "Neural network (TF-IDF, early stopping)",
-                        Accuracy = percent(binary_results$accuracy),
-                        Sensitivity = percent(binary_results$sensitivity),
-                        Specificity = percent(binary_results$specificity)))
+knitr::kable(data.frame(
+  Model = c("(a) Neural network", "(b) Ridge multinomial regression"),
+  Accuracy = percent(c(binary_results$accuracy, model$metrics$Accuracy)),
+  Sensitivity = percent(c(binary_results$sensitivity, model$metrics$Sensitivity)),
+  Specificity = percent(c(binary_results$specificity, model$metrics$Specificity))))
 ```
 
-**Part (b): Multiclass classification**
-
-```{r}
-knitr::kable(data.frame(Model = "Ridge multinomial regression",
-                        Accuracy = percent(model$metrics$Accuracy),
-                        Sensitivity = percent(model$metrics$Sensitivity),
-                        Specificity = percent(model$metrics$Specificity)))
-```
-
-For Part (b), sensitivity and specificity give equal weight to each of the five classes.
+Part (b)'s sensitivity and specificity give equal weight to all five classes.
 
 ### Comparison of models and results
 
-**Part (a):** Accuracy was `r percent(binary_results$accuracy)`, compared with `r percent(binary_baseline$accuracy)` for the same network trained for a fixed 5 epochs without early stopping, which showed signs of memorizing the training data rather than generalizing. None of the alternative methods tested (larger network, higher dropout, SVM, regularized logistic regression, added headers, tuned threshold) outperformed this model on accuracy, though the regularized logistic regression achieved a higher ROC AUC (87.3% vs. 84.2%), suggesting its predicted probabilities ranked pages well even though its default classification cutoff did not.
+**Part (a):** Early stopping increased accuracy from `r percent(binary_baseline$accuracy)` to `r percent(binary_results$accuracy)`, the highest recorded accuracy among the binary alternatives. These comparisons informed model selection, so this is a development estimate.
 
-**Part (b):** Accuracy was `r percent(model$metrics$Accuracy)`, compared with `r percent(model$baseline_accuracy)` for always choosing the most common class. The model identified `r percent(model$per_class$Sensitivity[5])` of “Other claim content” pages, showing room for improvement in this smaller class.
+**Part (b):** Accuracy was `r percent(model$metrics$Accuracy)`, compared with `r percent(model$baseline_accuracy)` for always predicting the most common class. Fewer than half of “Physical Activity” and “Other claim content” pages were correctly identified.
 
-**Overall:** The binary neural network achieved `r percent(binary_results$accuracy)` accuracy, and multiclass ridge regression achieved `r percent(model$metrics$Accuracy)`, with both improving on their own baselines. These accuracies do not directly rank the two methods because the tasks and validation splits differ. A remaining weakness is recognizing “Physical Activity” and “Other claim content” pages, with fewer than half correctly identified in each category. Both models produced predictions for all 929 test pages.
+**Overall:** Both models improved on their own baselines and produced the required test predictions. Their accuracies do not directly rank the methods because the tasks and validation splits differ. Improving recognition of the weaker multiclass categories remains a priority.

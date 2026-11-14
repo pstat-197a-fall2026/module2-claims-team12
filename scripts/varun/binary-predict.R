@@ -54,3 +54,7 @@ pred_df <- tibble(
 )
 
 print(table(pred_df$bclass.pred))
+
+# Save the binary portion of Deliverable 3.
+bclass_pred_df <- pred_df
+save(bclass_pred_df, file = 'results/preds-binary-group12.RData')

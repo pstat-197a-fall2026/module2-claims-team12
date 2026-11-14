@@ -102,8 +102,7 @@ model$split_sizes <- c(Training = length(train), Tuning = length(tune),
 saveRDS(model, "results/multiclass-model.rds")
 
 # 7. Deliverable 4: use the saved model to generate test predictions
-# Without retraining: run the libraries and the clean_text, word_counts, and
-# tfidf function definitions above, then run this section.
+# For predictions without retraining, run scripts/multiclass-predict.R.
 load("data/claims-test.RData")
 model <- readRDS("results/multiclass-model.rds")
 test_counts <- word_counts(clean_text(claims_test$text_tmp))
