@@ -412,5 +412,24 @@ print("\nWord-only second stage model")
 print("Accuracy:", round(accuracy_score(y_test, word_only_preds), 3))
 print("ROC AUC:", round(roc_auc_score(y_test, word_only_probs), 3))
 
+# Export data for Preliminary Task 3: Neural Network
+
+# Keep only the columns needed for neural network training
+nn_train = train_data[
+    [".id", "paragraph_text", "binary_label"]
+].copy()
+
+nn_test = test_data[
+    [".id", "paragraph_text", "binary_label"]
+].copy()
+
+# Save training and testing data
+nn_train.to_csv("data/nn-train.csv", index=False)
+nn_test.to_csv("data/nn-test.csv", index=False)
+
+print("Neural network data exported.")
+print("Training observations:", len(nn_train))
+print("Testing observations:", len(nn_test))
+
 # AI Use:
 # AI was used to translate and adapt course R code into Python assisting with logistic PCR/ bigram modeling + troubleshooting errors
