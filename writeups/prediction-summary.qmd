@@ -65,4 +65,4 @@ For Part (b), sensitivity and specificity give equal weight to each of the five 
 
 **Part (b):** Accuracy was `r percent(model$metrics$Accuracy)`, compared with `r percent(model$baseline_accuracy)` for always choosing the most common class. The model identified `r percent(model$per_class$Sensitivity[5])` of “Other claim content” pages, showing room for improvement in this smaller class.
 
-**Overall:** *[Summarize the main findings from both parts. Compare each model with its own baseline, since the two tasks differ.]*
+**Overall:** The binary neural network achieved `r percent(binary_results$accuracy)` accuracy, and multiclass ridge regression achieved `r percent(model$metrics$Accuracy)`, with both improving on their own baselines. These accuracies do not directly rank the two methods because the tasks and validation splits differ. A remaining weakness is recognizing “Physical Activity” and “Other claim content” pages, with fewer than half correctly identified in each category. Both models produced predictions for all 929 test pages.
