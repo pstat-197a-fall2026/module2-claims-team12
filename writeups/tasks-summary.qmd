@@ -18,12 +18,10 @@ For Preliminary Task #2, we were looking at whether bigrams provided additional 
 
 ### Neural net
 
-Summarize the neural network model you trained by desribing:
+For Preliminary Task #3, we trained a neural network on the same paragraph text used in Task 1, represented as TF-IDF scores. The architecture was a small feedforward network: a TF-IDF text-vectorization layer, followed by dropout, a dense layer, dropout again, and a final sigmoid output layer for binary classification. We used the Adam optimizer with binary cross-entropy loss, training for up to 25 epochs with early stopping (halting once validation performance stopped improving, typically well before 25 epochs) to avoid overfitting observed with a fixed epoch count.
 
--   architecture
+We experimented with 10 configurations in total: network size (10, 25, and 64 hidden units), dropout rate (0.2, 0.3, 0.5), including bigrams in addition to single words, limiting vocabulary size, and the share of data held out for early-stopping validation. Because neural network training is stochastic, we additionally reran our best-looking configuration four times to check whether its result was reliable rather than a lucky single run.
 
--   optimization and loss
+Across all configurations and repeated runs, test accuracy consistently fell in the 74-80% range (mean approximately 76%) with ROC AUC around 0.80-0.85, and no configuration reliably matched the paragraph-only logistic PCR benchmark from Task 1 (79.5% accuracy, 0.863 ROC AUC). As a sanity check, a ridge logistic regression fit on the same data independently landed at 79.5% accuracy and 0.845 ROC AUC, nearly identical to the PCR result. Two different methods converging on the same accuracy suggests this reflects a genuine performance ceiling for this dataset size (1,577 training pages) rather than an error in the neural network setup -- the tuned PCR model from Task 1 remains the stronger choice for this classification task.
 
--   training epochs
-
--   predictive accuracy
+A single-hidden-layer network (5 units) was also fit on the same 120 principal components used in Task 1's PCR model (`results/nn_model.rds`); its test accuracy is not reported here because the exact feature-generation pipeline used to produce those components was not preserved alongside the saved model, so its performance could not be independently reconstructed and verified for this summary.
